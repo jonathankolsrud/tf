@@ -7,9 +7,12 @@ html lang="en"
     title sizemaker
   body
     nav
-      a href="/" Register
-      a href="/showlogin" Login
-      a href="/bodymaker" bodymaker
-    h1 Welcome to Sizemaker!
-
+      a href="/bodymaker" Create New Body
+      - if nil == session[:id]
+        a href="/showlogin" Login
+        a href="/" Register
+      - else 
+        a href="/bodies" View Bodies
+        a #{session[:username]}
+        a href="/logout" logout
     == yield
