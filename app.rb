@@ -41,21 +41,28 @@ get('/sizedone') do
 end
 
 post('/sizedone') do
+    bodyname = params[:bodyname]
     user_id = session[:id].to_i
     topsize = session[:size]
-    bottomsize = "test"
+    bottomsize = session[:size]
     db = SQLite3::Database.new("db/db.db")
-    db.execute('INSERT INTO bodies (user_id,topsize,bottomsize) VALUES (?,?,?)',user_id,topsize,bottomsize)
+    db.execute('INSERT INTO bodies (bodyname,user_id,topsize,bottomsize) VALUES (?,?,?,?)',bodyname,user_id,topsize,bottomsize)
     redirect('/bodies')
 end
 
 get('/bodies') do
     id = session[:id].to_i
     db = SQLite3::Database.new('db/db.db')
+    db.results_as_hash = true
     result = db.execute("SELECT * FROM bodies WHERE user_id = ?",id)
     p "Alla bodies från result lol #{result}"
     slim(:"/bodies",locals:{bodies:result})
 end  
+
+post('/deletebody') do
+    delete = params[:delete]
+    p delete
+end
 
 
 

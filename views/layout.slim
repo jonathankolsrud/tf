@@ -7,12 +7,14 @@ html lang="en"
     title sizemaker
   body
     nav
-      a href="/bodymaker" Create New Body
-      - if nil == session[:id]
-        a href="/showlogin" Login
-        a href="/" Register
-      - else 
+      div id="nav1"
+        a href="/bodymaker" Create New Body
         a href="/bodies" View Bodies
-        a #{session[:username]}
-        a href="/logout" logout
+      div id="nav2"
+        - if nil == session[:id]
+            a href="/showlogin" Sign in
+            a href="/" Register
+        - else 
+            a #{session[:username]}
+            a href="/logout" Log Out
     == yield

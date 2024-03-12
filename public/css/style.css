@@ -1,4 +1,16 @@
 nav{
     display: flex;
+    justify-content: space-between;
+}
+
+#nav1{
+    display: flex;
     justify-content: space-evenly;
+    width: 50%;
+}
+
+#nav2{
+    display: flex;
+    justify-content: space-evenly;
+    width: 30%;
 }
