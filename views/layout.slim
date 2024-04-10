@@ -6,15 +6,16 @@ html lang="en"
     link rel="stylesheet" href="/css/style.css"/
     title sizemaker
   body
-    nav
-      div id="nav1"
-        a href="/bodymaker" Create New Body
-        a href="/bodies" View Bodies
-      div id="nav2"
-        - if nil == session[:id]
-            a href="/showlogin" Sign in
-            a href="/" Register
-        - else 
-            a #{session[:username]}
-            a href="/logout" Log Out
+    header
+      nav
+        div id="nav1"
+          a href="/bodymaker" Create New Body
+          a href="/bodies" View Bodies
+        div id="nav2"
+          - if nil == session[:id]
+              a href="/showlogin" Sign in
+              a href="/" Register
+          - else 
+              a #{session[:username]}
+              a href="/logout" Log Out
     == yield

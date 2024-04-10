@@ -1,15 +1,19 @@
 h2 all your bodies
-table border = "1" 
-    tr 
-        th Bodyname
-        th Topsize
-        th Bottomsize
+table id="bodies_table" 
     - bodies.each do |body|
+        tr 
+            th Bodyname
+            th Topsize
+            th Bottomsize
+            th height
+            th weight
         tr 
             th #{body["bodyname"]}
             th #{body["topsize"]}
             th #{body["bottomsize"]}
+            th #{body["height"]}cm
+            th #{body["weight"]}kg
             th 
-                form action="/deletebody" method="post"
-                    input type="hidden" id=body["bottomsize"] value=""
-                    input type="submit" value="delete"
+                form method="POST" action="bodies/#{body['id']}/delete"
+                    input type="submit" value="Delete"
+            

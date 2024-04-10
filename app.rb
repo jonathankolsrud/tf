@@ -33,6 +33,8 @@ post('/bodymaker') do
     height_id = db.execute("SELECT id FROM heights WHERE height = ?", height).first.first
     weight_id = db.execute("SELECT id FROM weights WHERE weight = ?", weight).first.first
     session[:size] = db.execute("SELECT size FROM heightweightsize WHERE height = ? AND weight = ?", height_id, weight_id).first.first
+    session[:height] = height
+    session[:weight] = weight
     redirect('/sizedone')
 end
 
@@ -45,8 +47,10 @@ post('/sizedone') do
     user_id = session[:id].to_i
     topsize = session[:size]
     bottomsize = session[:size]
+    height = session[:height]
+    weight = session[:weight] 
     db = SQLite3::Database.new("db/db.db")
-    db.execute('INSERT INTO bodies (bodyname,user_id,topsize,bottomsize) VALUES (?,?,?,?)',bodyname,user_id,topsize,bottomsize)
+    db.execute('INSERT INTO bodies (bodyname,user_id,topsize,bottomsize,height,weight) VALUES (?,?,?,?,?,?)',bodyname,user_id,topsize,bottomsize,height,weight)
     redirect('/bodies')
 end
 
@@ -59,9 +63,12 @@ get('/bodies') do
     slim(:"/bodies",locals:{bodies:result})
 end  
 
-post('/deletebody') do
-    delete = params[:delete]
-    p delete
+post('/bodies/:id/delete') do
+    body_id = params[:id].to_i
+    p body_id
+    db = SQLite3::Database.new('db/db.db')
+    bodies = db.execute("DELETE FROM bodies WHERE id = ?",body_id)
+    redirect('/bodies')
 end
 
 

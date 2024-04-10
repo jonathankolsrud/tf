@@ -1,6 +1,10 @@
 h2 done
 -size = session[:size]
+-height = session[:height]
+-weight = session[:weight]
 p #{size}
+p #{height}
+p #{weight}
 form action="/sizedone" method="post"
     input type="text" name="bodyname" placeholder="Enter Bodyname"
     input type="submit" value="Save Body"
