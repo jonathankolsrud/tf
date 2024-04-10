@@ -3,15 +3,12 @@ require 'sinatra/reloader'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
+require_relative 'model.rb'
 
 enable :sessions
 
 get('/') do
-    if nil == session[:id]
-        redirect('/register')
-    else
-        slim(:bodymaker)
-    end
+    no_login()
 end
 
 get('/register') do
@@ -19,22 +16,14 @@ get('/register') do
 end
 
 get('/bodymaker') do
-    if nil == session[:id]
-        redirect('/showlogin')
-    end
+    no_login()
     slim(:bodymaker)
 end
 
 post('/bodymaker') do
-    id = session[:id]
     height = params[:height]
     weight = params[:weight]
-    db = SQLite3::Database.new("db/db.db")
-    height_id = db.execute("SELECT id FROM heights WHERE height = ?", height).first.first
-    weight_id = db.execute("SELECT id FROM weights WHERE weight = ?", weight).first.first
-    session[:size] = db.execute("SELECT size FROM heightweightsize WHERE height = ? AND weight = ?", height_id, weight_id).first.first
-    session[:height] = height
-    session[:weight] = weight
+    get_size(height, weight)
     redirect('/sizedone')
 end
 
@@ -44,34 +33,21 @@ end
 
 post('/sizedone') do
     bodyname = params[:bodyname]
-    user_id = session[:id].to_i
-    topsize = session[:size]
-    bottomsize = session[:size]
-    height = session[:height]
-    weight = session[:weight] 
-    db = SQLite3::Database.new("db/db.db")
-    db.execute('INSERT INTO bodies (bodyname,user_id,topsize,bottomsize,height,weight) VALUES (?,?,?,?,?,?)',bodyname,user_id,topsize,bottomsize,height,weight)
+    save_size(bodyname)
     redirect('/bodies')
 end
 
 get('/bodies') do
-    id = session[:id].to_i
-    db = SQLite3::Database.new('db/db.db')
-    db.results_as_hash = true
-    result = db.execute("SELECT * FROM bodies WHERE user_id = ?",id)
-    p "Alla bodies från result lol #{result}"
+    no_login()
+    result = all_bodies_for_user()
     slim(:"/bodies",locals:{bodies:result})
 end  
 
 post('/bodies/:id/delete') do
     body_id = params[:id].to_i
-    p body_id
-    db = SQLite3::Database.new('db/db.db')
-    bodies = db.execute("DELETE FROM bodies WHERE id = ?",body_id)
+    delete_body(body_id)
     redirect('/bodies')
 end
-
-
 
 get('/showlogin') do
     slim(:login)
@@ -81,40 +57,16 @@ post('/users/new') do
     username = params[:username]
     password = params[:password]
     password_confirmed = params[:password_confirmed]
-  
-    if (password == password_confirmed)
-      #lägg till användare
-      password_digest = BCrypt::Password.create(password)
-      db = SQLite3::Database.new('db/db.db')
-      db.execute('INSERT INTO users (username,pwdigest) VALUES (?,?)',username,password_digest)
-      redirect('/bodymaker')
-  
-    else
-      #felhantering
-      "lösenorden matchade inte"
-    end
+    register(username, password, password_confirmed)
 end
 
 post('/login') do
     username = params[:username]
     password = params[:password]
-    db = SQLite3::Database.new('db/db.db')
-    db.results_as_hash = true
-    result = db.execute("SELECT * FROM users WHERE username = ?",username).first
-    pwdigest = result["pwdigest"]
-    id = result["id"]
-    if BCrypt::Password.new(pwdigest) == password
-        session[:id] = id
-        session[:username] = username
-        redirect('/bodymaker')
-        
-    else
-        "FEL LÖSEN HAHA!"
-    end
+    login(username, password)
 end
 
 get('/logout') do
-    session[:id] = nil
-    session[:username] = nil
-    redirect('/register')
+    session.clear
+    redirect('/showlogin')
 end

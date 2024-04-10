@@ -14,7 +14,7 @@ html lang="en"
         div id="nav2"
           - if nil == session[:id]
               a href="/showlogin" Sign in
-              a href="/" Register
+              a href="/register" Register
           - else 
               a #{session[:username]}
               a href="/logout" Log Out
