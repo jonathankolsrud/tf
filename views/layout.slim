@@ -9,13 +9,15 @@ html lang="en"
     header
       nav
         div id="nav1"
-          a href="/bodymaker" Create New Body
-          a href="/bodies" View Bodies
+          a href="/bodies/new" Create New Body
+          a href="/bodies/index" View Bodies
+          - if "admin"==session[:authority]
+            a href="/bodies/index_admin" View Everyones Bodies
         div id="nav2"
           - if nil == session[:id]
               a href="/showlogin" Sign in
               a href="/register" Register
           - else 
-              a #{session[:username]}
+              a #{session[:authority]}: #{session[:username]}
               a href="/logout" Log Out
     == yield

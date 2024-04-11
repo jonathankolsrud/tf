@@ -1,0 +1,13 @@
+
+- bodies.each do |body|
+    h1 Body: #{body["bodyname"]}
+    
+    form action="/bodies/#{body['id']}/update" method="POST"
+        - if "admin"==session[:authority]
+            input type="text" name="admin_id" placeholder="#{body["id"]}"
+            input type="text" name="user_id" placeholder="#{body["user_id"]}"
+        input type="text" name="bodyname" placeholder="#{body["bodyname"]}"
+        input type="text" name="height" placeholder="#{body["height"]}"
+        input type="text" name="weight" placeholder="#{body["weight"]}"
+        input type="text" name="size" placeholder="#{body["size"]}"
+        input type="submit" value="Update Body"
