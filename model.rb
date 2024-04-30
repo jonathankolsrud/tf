@@ -6,6 +6,10 @@ def user()
 end
 
 def admin()
+    if "admin" != session[:authority]
+        flash[:notice] = "Du har inte behörighet att göra detta!"
+        
+    end
 end
 
 def register(username, password, password_confirmed)
@@ -72,7 +76,12 @@ end
 
 def delete_body(body_id)
     db = SQLite3::Database.new('db/db.db')
-    bodies = db.execute("DELETE FROM bodies WHERE id = ?",body_id)
+    user_id = db.execute("SELECT user_id FROM bodies WHERE id = ?",body_id).first.first
+    if session[:id] == user_id || "admin"==session[:authority] 
+        bodies = db.execute("DELETE FROM bodies WHERE id = ?",body_id)
+    else
+        flash[:notice] = "Du har inte behörighet att göra detta!"
+    end
 end
 
 def all_bodies_for_user()

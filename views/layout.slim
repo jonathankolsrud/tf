@@ -20,4 +20,7 @@ html lang="en"
           - else 
               a #{session[:authority]}: #{session[:username]}
               a href="/logout" Log Out
+    - if flash[:notice]
+      p.notice = flash[:notice]
     == yield
+  script src="js/main.js"
