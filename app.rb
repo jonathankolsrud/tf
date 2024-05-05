@@ -8,6 +8,19 @@ require 'sinatra/flash'
 
 enable :sessions
 
+before('/user/*') do
+    if nil == session[:id]
+        redirect('/showlogin')
+    end
+end
+
+before('/correctuser/*') do
+end
+
+before('/admin/*') do
+end
+
+
 get('/') do
     user()
 end
@@ -17,48 +30,48 @@ get('/register') do
 end
 
 
-get('/bodies/new') do
+get('/user/bodies/new') do
     user()
     slim(:new)
 end
 
-post('/bodies/new') do
+post('/user/bodies/new') do
     height = params[:height]
     weight = params[:weight]
     get_size(height, weight)
-    redirect('/bodies/create')
+    redirect('/user/bodies/create')
 end
 
-get('/bodies/create') do
+get('/user/bodies/create') do
     user()
     slim(:create)
 end
 
-post('/bodies/create') do
+post('/user/bodies/create') do
     bodyname = params[:bodyname]
     save_body(bodyname)
     redirect('/bodies/index')
 end
 
-get('/bodies/index') do
+get('/user/bodies/index') do
     user()
     result = all_bodies_for_user()
     slim(:"/index",locals:{bodies:result})
 end  
 
-get('/bodies/index_admin') do
+get('/user/bodies/index_admin') do
     user()
     admin()
     result = all_bodies_for_everyone()
     slim(:"/index_admin",locals:{bodies:result})
 end  
 
-get('/bodies/:id/edit') do
+get('/user/bodies/:id/edit') do
     id = params[:id].to_i
     edit_body(id)
 end
 
-post('/bodies/:id/update') do
+post('/user/bodies/:id/update') do
     if "admin"==session[:authority]
         new_id =  params[:admin_id].to_i
         new_user_id = params[:user_id].to_i
@@ -74,7 +87,7 @@ post('/bodies/:id/update') do
     update_body(body_id, bodyname, size, height, weight, new_id, new_user_id)
 end
 
-post('/bodies/:id/delete') do
+post('/user/bodies/:id/delete') do
     body_id = params[:id].to_i
     delete_body(body_id)
     redirect('/bodies/index')
@@ -101,3 +114,4 @@ get('/logout') do
     session.clear
     redirect('/showlogin')
 end
+
