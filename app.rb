@@ -16,6 +16,7 @@ get('/register') do
     slim(:register)
 end
 
+
 get('/bodies/new') do
     user()
     slim(:new)
@@ -65,12 +66,12 @@ post('/bodies/:id/update') do
         new_id =  params[:id].to_i
         new_user_id = session[:id].to_i
     end
-    id = params[:id].to_i
+    body_id = params[:id].to_i
     bodyname = params[:bodyname]
     size = params[:size]
     height = params[:height]
     weight = params[:weight]
-    update_body(id, bodyname, size, height, weight, new_id, new_user_id)
+    update_body(body_id, bodyname, size, height, weight, new_id, new_user_id)
 end
 
 post('/bodies/:id/delete') do
