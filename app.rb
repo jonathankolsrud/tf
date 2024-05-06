@@ -6,6 +6,7 @@ require 'bcrypt'
 require_relative 'model.rb'
 require 'sinatra/flash'
 
+
 enable :sessions
 
 before('/user/*') do
@@ -14,56 +15,58 @@ before('/user/*') do
     end
 end
 
-before('/correctuser/*') do
+before('/user/bodies/:id/*') do
+    body_id = params[:id].to_i
+    if owns_body?(body_id) || session[:authority] == 'admin'
+        return
+    else
+        flash[:notice] = "Du har inte tillåtelse att göra detta!"
+        redirect('/user/bodies/index')
+    end
 end
 
 before('/admin/*') do
+    if session[:authority] == 'admin'
+        return 
+    else
+        flash[:notice] = "Du har inte tillåtelse att göra detta!"
+        redirect('/') 
+    end
 end
-
 
 get('/') do
-    user()
+    redirect('/showlogin')
 end
-
-get('/register') do
-    slim(:register)
-end
-
 
 get('/user/bodies/new') do
-    user()
-    slim(:new)
+    slim(:"/bodies/new")
 end
 
 post('/user/bodies/new') do
     height = params[:height]
     weight = params[:weight]
     get_size(height, weight)
-    redirect('/user/bodies/create')
+    redirect('/user/bodies')
 end
 
-get('/user/bodies/create') do
-    user()
-    slim(:create)
+get('/user/bodies') do
+    slim(:"/bodies/create")
 end
 
-post('/user/bodies/create') do
+post('/user/bodies') do
     bodyname = params[:bodyname]
     save_body(bodyname)
-    redirect('/bodies/index')
+    redirect('/user/bodies/index')
 end
 
 get('/user/bodies/index') do
-    user()
     result = all_bodies_for_user()
-    slim(:"/index",locals:{bodies:result})
+    slim(:"/bodies/index",locals:{bodies:result, bodiesadmin:nil})
 end  
 
-get('/user/bodies/index_admin') do
-    user()
-    admin()
-    result = all_bodies_for_everyone()
-    slim(:"/index_admin",locals:{bodies:result})
+get('/admin/bodies/index') do
+    resultadmin = all_bodies_for_everyone()
+    slim(:"/bodies/index",locals:{bodiesadmin:resultadmin})
 end  
 
 get('/user/bodies/:id/edit') do
@@ -73,10 +76,8 @@ end
 
 post('/user/bodies/:id/update') do
     if "admin"==session[:authority]
-        new_id =  params[:admin_id].to_i
         new_user_id = params[:user_id].to_i
     else
-        new_id =  params[:id].to_i
         new_user_id = session[:id].to_i
     end
     body_id = params[:id].to_i
@@ -84,30 +85,69 @@ post('/user/bodies/:id/update') do
     size = params[:size]
     height = params[:height]
     weight = params[:weight]
-    update_body(body_id, bodyname, size, height, weight, new_id, new_user_id)
+    update_body(body_id, bodyname, size, height, weight, new_user_id)
+    redirect('/user/bodies/index')
 end
 
 post('/user/bodies/:id/delete') do
     body_id = params[:id].to_i
     delete_body(body_id)
-    redirect('/bodies/index')
+    redirect('/user/bodies/index')
 end
 
 get('/showlogin') do
     slim(:login)
 end  
 
-post('/users/new') do
+get('/register') do
+    slim(:register)
+end
+
+post('/register') do
     username = params[:username]
     password = params[:password]
     password_confirmed = params[:password_confirmed]
-    register(username, password, password_confirmed)
+    if !field_empty?(username, password)
+        if !user_exist?(username)
+            if comparepassword(password, password_confirmed)
+                if lengthvalidation(username, password)
+                    register(username, password)
+                    flash[:notice] = "Registeringen lyckades!"
+                    redirect('/showlogin')
+                else
+                    flash[:notice] = "Lösenordet eller Användernamnet var för kort!"
+                    redirect('/register')
+                end
+            else
+                flash[:notice] = "Lösenorden matchar inte!"
+                redirect('/register')
+            end
+        else
+            flash[:notice] = "Denna användare finns redan!"
+            redirect('/register')
+        end
+    else
+        flash[:notice] = "Ett av fälten lämnades tomt!"
+        redirect('/register')
+    end
 end
 
 post('/login') do
     username = params[:username]
     password = params[:password]
-    login(username, password)
+    if !field_empty?(username, password)
+        if user_exist?(username) && passwordvalidation(username, password)
+                login(username)
+                flash[:notice] = "Inloggningen lyckades!"
+                redirect('/user/bodies/new')
+        else
+            flash[:notice] = "Användaren finns inte eller så stämmer inte Lösenordet!"
+            redirect('/showlogin')
+        end
+    else
+        flash[:notice] = "Ett av fälten lämnades tomt!"
+        redirect('/showlogin')
+    end
 end
 
 get('/logout') do

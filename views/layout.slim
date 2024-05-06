@@ -9,10 +9,10 @@ html lang="en"
     header
       nav
         div id="nav1"
-          a href="/bodies/new" Create New Body
-          a href="/bodies/index" View Bodies
+          a href="/user/bodies/new" Create New Body
+          a href="/user/bodies/index" View Bodies
           - if "admin"==session[:authority]
-            a href="/bodies/index_admin" View Everyones Bodies
+            a href="/admin/bodies/index" View Everyones Bodies
         div id="nav2"
           - if nil == session[:id]
               a href="/showlogin" Sign in
