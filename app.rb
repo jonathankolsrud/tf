@@ -152,7 +152,7 @@ end
 
 # Attempts login and redirects to '/user/bodies/new'
 #
-# @param [String :username, the users username
+# @param [String] :username, the users username
 # @param [String] :password, the users password
 #
 # @see Model#login
@@ -182,7 +182,7 @@ end
 
 #Attempts registers and redirects to '/showlogin'
 #
-# @param [String :username, the users username
+# @param [String] :username, the users username
 # @param [String] :password, the users password
 # @param [String] :password_confirmed, the users password
 #
