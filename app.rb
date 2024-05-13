@@ -225,8 +225,10 @@ end
 
 #Deletes the user, clears the session and redirects to '/showlogin'
 #
-get('/delete_user') do
+get('/user/delete_user') do
     id = session[:id]
+    
     delete_user(id)
+    session.clear
     redirect('/showlogin')
 end

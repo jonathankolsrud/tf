@@ -20,7 +20,7 @@ html lang="en"
           - else 
               a #{session[:authority]}: #{session[:username]}
               a href="/logout" Log Out
-              a href="/delete_user" Delete user
+              a href="/user/delete_user" Delete user
     - if flash[:notice]
       p.notice = flash[:notice]
     == yield

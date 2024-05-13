@@ -105,6 +105,15 @@ module Model
         session[:username] = result["username"]
     end
 
+    # Deletes the user and their bodies
+    #
+    # @param [String] id The users id
+    def delete_user(id)
+        db = connect_to_db('db/db.db')
+        db.execute("DELETE FROM bodies WHERE user_id = ?",id)
+        db.execute("DELETE FROM users WHERE id = ?",id)
+    end
+
     # Gets size from table and updates the sessions
     #
     # @param [Integer] height The body's height
