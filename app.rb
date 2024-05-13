@@ -223,3 +223,10 @@ get('/logout') do
     redirect('/showlogin')
 end
 
+#Deletes the user, clears the session and redirects to '/showlogin'
+#
+get('/delete_user') do
+    id = session[:id]
+    delete_user(id)
+    redirect('/showlogin')
+end
